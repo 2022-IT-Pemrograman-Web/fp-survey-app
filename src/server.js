@@ -48,7 +48,8 @@ fastify.get("/login", async (req, rep) => {
       });
     }
     return rep.send({
-      users,
+      name: users[0].name,
+      id: users[0].id,
       message: "login",
       success: true,
     });
@@ -87,7 +88,9 @@ fastify.post("/register", async (req, rep) => {
     await fastify.firebase.firestore().collection("User").doc(UserId).set(user);
     return rep.send({
       message: "User created",
-      data: user,
+      username: user.username,
+      email: user.email,
+      name: user.name,
       success: true,
     });
   } catch (err) {
