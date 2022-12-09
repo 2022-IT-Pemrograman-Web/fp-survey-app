@@ -92,6 +92,82 @@ fastify.post("/register", async (req, rep) => {
   }
 });
 
+fastify.post("/form", async (req, rep) => {
+  try {
+    const formId = await fastify.firebase.firestore().collection("Form").doc()
+      .id;
+    // console.log(UserId);
+    const form = {
+      id: formId,
+      Deskripsi: req.body.Deskripsi,
+      Nama: req.body.Nama,
+      id_user: req.body.id_user,
+    };
+    await fastify.firebase.firestore().collection("Form").doc(formId).set(form);
+    return rep.send({
+      message: "form created",
+      data: form,
+      success: true,
+    });
+  } catch (err) {
+    return rep.send({
+      message: err,
+      success: false,
+    });
+  }
+});
+
+fastify.get("/Isiform/:id", async (req, rep) => {
+  try {
+    let Pertanyaans = await fastify.firebase
+      .firestore()
+      .collection("Pertanyaan")
+      .where("id_form", "==", req.query.id)
+      .get();
+    Pertanyaans = Pertanyaans.docs.map((doc) => doc.data());
+    return rep.send({
+      Pertanyaans,
+      message: "All Question",
+      success: true,
+    });
+  } catch (err) {
+    return rep.send({
+      message: err,
+      success: false,
+    });
+  }
+});
+
+fastify.post("/Pertanyaan", async (req, rep) => {
+  try {
+    const PertanyaanId = await fastify.firebase
+      .firestore()
+      .collection("Pertanyaan")
+      .doc().id;
+    // console.log(UserId);
+    const Pertanyaan = {
+      id: PertanyaanId,
+      Pertanyaan: req.body.Pertanyaan,
+      id_form: req.body.id_form,
+    };
+    await fastify.firebase
+      .firestore()
+      .collection("Pertanyaan")
+      .doc(PertanyaanId)
+      .set(Pertanyaan);
+    return rep.send({
+      message: "Pertanyaan created",
+      data: Pertanyaan,
+      success: true,
+    });
+  } catch (err) {
+    return rep.send({
+      message: err,
+      success: false,
+    });
+  }
+});
+
 const start = async () => {
   try {
     await fastify.listen(PORT);
