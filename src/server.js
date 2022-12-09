@@ -37,7 +37,13 @@ fastify.get("/login", async (req, rep) => {
     // return users.length;
     if (users.length === 0) {
       return rep.send({
-        message: "No user found",
+        message: "Wrong username or password",
+        success: false,
+      });
+    }
+    if (users[0].password !== req.body.password) {
+      return rep.send({
+        message: "Wrong username or password",
         success: false,
       });
     }
