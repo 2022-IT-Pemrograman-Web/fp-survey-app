@@ -15,6 +15,11 @@ npm run serve
 npm run build
 ```
 
+### Run Fastify
+```
+npm run dev
+```
+
 ### Lints and fixes files
 ```
 npm run lint
