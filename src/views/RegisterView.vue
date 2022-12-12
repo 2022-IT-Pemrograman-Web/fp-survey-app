@@ -37,7 +37,12 @@
           :error-messages="v$.user.password.$error"
           label="Password"
           required
+          type="password"
         ></v-text-field>
+        <p>
+          Already have an account?
+          <button @click="loginPage" role="link" class="login">Login</button>
+        </p>
         <v-btn
           type="submit"
           color="purple"
@@ -89,5 +94,21 @@ export default {
       },
     };
   },
+
+  methods: {
+    onSubmit() {
+      this.$router.push("/login");
+    },
+    loginPage() {
+      this.$router.push("/login");
+    },
+  },
 };
 </script>
+
+<style>
+.login {
+  color: #3f51b5;
+  text-decoration: underline;
+}
+</style>
