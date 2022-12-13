@@ -126,6 +126,55 @@ fastify.post("/form", async (req, rep) => {
   }
 });
 
+fastify.get("/past-form", async (req, rep) => {
+  try {
+    let forms = await fastify.firebase
+      .firestore()
+      .collection("Isiform")
+      .where("id_user", "==", req.query.id)
+      .get();
+    forms = forms.docs.map((doc) => doc.data());
+    let item = {};
+    let list_id_form = [];
+    for (let form in forms) {
+      let { id_form, id, tanggal_isi } = forms[form];
+      item[id_form] = id;
+      list_id_form[id_form] = tanggal_isi;
+      list_id_form.push(id_form);
+    }
+    let nama_forms = await fastify.firebase
+      .firestore()
+      .collection("Form")
+      .where("id", "in", list_id_form)
+      .get();
+    nama_forms = nama_forms.docs.map((doc) => doc.data());
+    let formulirs = {};
+    for (let nama_form in nama_forms) {
+      let { id, Nama } = nama_forms[nama_form];
+      formulirs[id] = Nama;
+    }
+    let formulir = [];
+    for (let i in item) {
+      formulir.push({
+        id_form: i,
+        nama_form: formulirs[i],
+        id_Isiform: item[i],
+        tanggal_isi: list_id_form[i],
+      });
+    }
+    return rep.send({
+      message: "form yang sudah diisi",
+      formulir,
+      success: true,
+    });
+  } catch (err) {
+    return rep.send({
+      message: err,
+      success: false,
+    });
+  }
+});
+
 fastify.get("/Isiform/:id", async (req, rep) => {
   try {
     let Pertanyaans = await fastify.firebase
@@ -134,9 +183,46 @@ fastify.get("/Isiform/:id", async (req, rep) => {
       .where("id_form", "==", req.query.id)
       .get();
     Pertanyaans = Pertanyaans.docs.map((doc) => doc.data());
+    let pertanyaan = [];
+    for (let i in Pertanyaans) {
+      pertanyaan.push({ Pertanyaan: Pertanyaans[i].Pertanyaan });
+    }
+    // return pertanyaan;
     return rep.send({
-      Pertanyaans,
+      pertanyaan,
       message: "All Question",
+      success: true,
+    });
+  } catch (err) {
+    return rep.send({
+      message: err,
+      success: false,
+    });
+  }
+});
+
+fastify.post("/Isiform/:id", async (req, rep) => {
+  // return req.body.jawabans;
+  try {
+    const IsiformId = await fastify.firebase
+      .firestore()
+      .collection("Isiform")
+      .doc().id;
+    const Isiform = {
+      id: IsiformId,
+      id_form: req.query.id,
+      id_user: req.body.id_user,
+      Jawaban: req.body.jawabans,
+      tanggal_isi: new Date(),
+    };
+    await fastify.firebase
+      .firestore()
+      .collection("Isiform")
+      .doc(IsiformId)
+      .set(Isiform);
+    return rep.send({
+      message: "Isiform created",
+      data: Isiform,
       success: true,
     });
   } catch (err) {
@@ -177,6 +263,31 @@ fastify.post("/Pertanyaan", async (req, rep) => {
   }
 });
 
+fastify.get("/past_jawaban", async (req, rep) => {
+  try {
+    let Jawabans = await fastify.firebase
+      .firestore()
+      .collection("Isiform")
+      .where("id", "==", req.query.id)
+      .get();
+    Jawabans = Jawabans.docs.map((doc) => doc.data());
+    let jawaban = [];
+    for (let i in Jawabans) {
+      jawaban.push({ Jawaban: Jawabans[i].Jawaban });
+    }
+    // return pertanyaan;
+    return rep.send({
+      jawaban,
+      message: "All Jawaban",
+      success: true,
+    });
+  } catch (err) {
+    return rep.send({
+      message: err,
+      success: false,
+    });
+  }
+});
 const start = async () => {
   try {
     await fastify.listen(PORT);
