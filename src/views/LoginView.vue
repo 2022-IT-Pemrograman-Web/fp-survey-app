@@ -9,7 +9,7 @@
       <p class="text-h3 text--primary my-5">Login</p>
     </v-card-title>
     <v-card-text>
-      <v-form v-model="v$.$dirty" @submit.prevent="onSubmit">
+      <v-form v-model="v$.$dirty" @submit.prevent="onSubmit" lazy-validation>
         <v-text-field
           class="my-1"
           v-model="user.username"
@@ -23,7 +23,14 @@
           :error-messages="v$.user.password.$error"
           label="Password"
           required
+          type="password"
         ></v-text-field>
+        <p>
+          New User?
+          <button @click="registerPage" role="link" class="register">
+            Register
+          </button>
+        </p>
         <v-btn
           type="submit"
           color="purple"
@@ -44,16 +51,15 @@ export default {
   setup() {
     return { v$: useVuelidate() };
   },
-
   data() {
     return {
       user: {
         username: "",
         password: "",
+        tes: "",
       },
     };
   },
-
   validations() {
     return {
       user: {
@@ -66,5 +72,20 @@ export default {
       },
     };
   },
+  methods: {
+    onSubmit() {
+      console.log(this.user);
+    },
+    registerPage() {
+      this.$router.push("/register");
+    },
+  },
 };
 </script>
+
+<style>
+.register {
+  color: #3f51b5;
+  text-decoration: underline;
+}
+</style>
