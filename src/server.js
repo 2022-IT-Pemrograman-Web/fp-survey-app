@@ -21,6 +21,30 @@ fastify.get("/allUser", async (req, rep) => {
   }
 });
 
+fastify.get("/getform", async (req, rep) => {
+  try {
+    let form = await fastify.firebase.firestore().collection("Form").get();
+    form = form.docs.map((doc) => doc.data());
+    let item = {};
+    for (let i in form) {
+      if (form[i].id_user == req.query.id) {
+        continue;
+      } else {
+        item[form[i].id] = form[i];
+      }
+    }
+    return rep.send({
+      item,
+      message: "All form",
+      success: true,
+    });
+  } catch (err) {
+    return rep.send({
+      message: err,
+      success: false,
+    });
+  }
+});
 fastify.get("/login", async (req, rep) => {
   try {
     let body = "";
