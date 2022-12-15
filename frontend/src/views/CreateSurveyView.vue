@@ -143,8 +143,8 @@ export default {
     };
   },
   beforeMount() {
-    this.user = localStorage.getItem("user");
-    this.accessToken = JSON.parse.getItem("accessToken");
+    this.user = JSON.parse(localStorage.getItem("user"));
+    this.accessToken = JSON.parse(localStorage.getItem("accessToken"));
   },
   methods: {
     addQuestion() {
@@ -180,7 +180,9 @@ export default {
       };
       try {
         this.isLoading = true;
-        await axios.post("http://localhost:5000/form", this.survey, headers);
+        await axios.post("http://localhost:5000/form", this.survey, {
+          headers,
+        });
         this.$router.push({
           path: "/my_surveys",
           query: { created: "success" },

@@ -1,6 +1,15 @@
 <template>
   <AppBar />
-  <v-container v-if="isNull" class="d-flex flex-column">
+  <v-container v-if="isLoading" class="d-flex flex-row">
+    <v-progress-circular
+      :size="50"
+      :width="7"
+      color="purple"
+      indeterminate
+      class="mx-auto my-15"
+    ></v-progress-circular>
+  </v-container>
+  <v-container v-else-if="isNull" class="d-flex flex-column">
     <p class="text-h4 text--primary text-center my-10">
       You do not have any survey
     </p>
@@ -54,6 +63,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       isNull: false,
       surveys: [],
       ...useUser(),
@@ -67,6 +77,7 @@ export default {
   methods: {
     async getSurveys() {
       try {
+        this.isLoading = true;
         const response = await axios.get(
           `http://localhost:5000/form?surveyorId=${this.user.id}`,
           {
@@ -81,6 +92,7 @@ export default {
       } catch (error) {
         console.error(error);
       }
+      this.isLoading = false;
     },
     toAnswers(id) {
       this.$router.push(`/survey_responses/${id}`);

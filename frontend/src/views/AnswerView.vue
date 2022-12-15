@@ -1,6 +1,16 @@
 <template>
   <AppBar />
+  <v-container v-if="isLoading" class="d-flex flex-row">
+    <v-progress-circular
+      :size="50"
+      :width="7"
+      color="purple"
+      indeterminate
+      class="mx-auto my-15"
+    ></v-progress-circular>
+  </v-container>
   <v-card
+    v-else
     class="d-flex flex-column mx-auto my-16 py-5 px-5"
     max-width="700"
     min-height="300"
@@ -29,6 +39,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       answer: {},
       ...useUser(),
     };
@@ -41,6 +52,7 @@ export default {
   methods: {
     async getAnswer() {
       try {
+        this.isLoading = true;
         const response = await axios.get(
           `http://localhost:5000/answer/${this.$route.params.id}`,
           {
@@ -51,6 +63,7 @@ export default {
           }
         );
         this.answer = response.data.answer;
+        this.isLoading = false;
       } catch (error) {
         console.error(error);
       }
