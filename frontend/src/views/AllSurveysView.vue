@@ -1,7 +1,12 @@
 <template>
   <AppBar />
-  <v-container>
-    <p class="text-h4 text--primary text-center my-5">Available Surveys</p>
+  <v-container v-if="isNull">
+    <p class="text-h4 text--primary text-center my-10">
+      Oops! There is no available survey :(
+    </p>
+  </v-container>
+  <v-container v-else>
+    <p class="text-h4 text--primary text-center my-10">Available Surveys</p>
     <v-card
       class="d-flex flex-column mx-auto my-4 py-5 px-5"
       max-width="700"
@@ -41,6 +46,7 @@ export default {
   },
   data() {
     return {
+      isNull: false,
       surveys: [],
       ...useUser(),
     };
@@ -56,6 +62,7 @@ export default {
           `http://localhost:5000/all_forms?userId=${this.user.id}`
         );
         this.surveys = response.data.forms;
+        if (this.surveys.length === 0) this.isNull = true;
       } catch (error) {
         console.error(error);
       }

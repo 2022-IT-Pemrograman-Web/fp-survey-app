@@ -1,5 +1,4 @@
 <template>
-  <AppBar />
   <v-card
     class="d-flex flex-column mx-auto my-16 py-5 px-5"
     max-width="1200"
@@ -42,12 +41,8 @@
 <script>
 import axios from "axios";
 import useUser from "../store/user";
-import AppBar from "@/components/AppBar.vue";
 
 export default {
-  components: {
-    AppBar,
-  },
   data() {
     return {
       tempAnswers: {},
