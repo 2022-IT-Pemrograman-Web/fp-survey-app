@@ -119,11 +119,7 @@ export default {
       };
       try {
         this.isLoading = true;
-        const response = await axios.post(
-          "http://localhost:5000/register",
-          this.user,
-          headers
-        );
+        await axios.post("http://localhost:5000/register", this.user, headers);
         this.$router.push({ path: "/login", query: { registered: true } });
       } catch (error) {
         console.error(error);
