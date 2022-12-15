@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <p class="text-h4 text--primary text-center my-5">My Survey(s)</p>
+    <p class="text-h4 text--primary text-center my-5">My Answer(s)</p>
     <v-card
       class="d-flex flex-column mx-auto my-4 py-5 px-5"
       max-width="600"
@@ -21,8 +21,8 @@
         </v-list-item-content>
       </v-card-text>
       <v-card-actions>
-        <v-btn class="mx-auto" color="purple" to="/survey_responses"
-          >Responses</v-btn
+        <v-btn class="mx-auto" color="purple" to="/response"
+          >See the answers</v-btn
         >
       </v-card-actions>
     </v-card>
@@ -62,11 +62,6 @@ export default {
         },
       ],
     };
-  },
-  methods: {
-    submitAnswers() {
-      console.log(this.tempAnswers);
-    },
   },
 };
 </script>

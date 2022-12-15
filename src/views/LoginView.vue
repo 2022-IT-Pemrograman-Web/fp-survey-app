@@ -13,14 +13,14 @@
         <v-text-field
           class="my-1"
           v-model="user.username"
-          :error-messages="v$.user.username.$error"
+          :error-messages="v$.user.username?.$error"
           label="Username"
           required
         ></v-text-field>
         <v-text-field
           class="my-1"
           v-model="user.password"
-          :error-messages="v$.user.password.$error"
+          :error-messages="v$.user.password?.$error"
           label="Password"
           required
           type="password"
@@ -44,8 +44,10 @@
 </template>
 
 <script>
+import axios from "axios";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
+import useUser from "../store/user";
 
 export default {
   setup() {
@@ -70,11 +72,22 @@ export default {
           required,
         },
       },
+      ...useUser(),
     };
   },
   methods: {
-    onSubmit() {
-      console.log(this.user);
+    async onSubmit() {
+      const headers = {
+        "Content-Type": "application/json",
+      };
+      const response = await axios.post(
+        "http://localhost:5000/login",
+        this.user,
+        headers
+      );
+      this.user = response.data;
+      localStorage.setItem("user", JSON.stringify(this.user));
+      this.$router.push("/");
     },
     registerPage() {
       this.$router.push("/register");

@@ -9,7 +9,7 @@
       <p class="text-h3 text--primary my-5">Register</p>
     </v-card-title>
     <v-card-text>
-      <v-form v-model="v$.$dirty" @submit.prevent="onSubmit">
+      <v-form v-model="v$.$dirty" @submit.prevent="onSubmit()">
         <v-text-field
           class="my-1"
           v-model="user.username"
@@ -55,7 +55,9 @@
           type="submit"
           color="purple"
           class="my-3"
-          :disabled="v$.user.$invalid || v$.confirmPassword.$invalid"
+          :disabled="
+            v$.user.$invalid || v$.confirmPassword.$invalid || isLoading
+          "
           >Register</v-btn
         >
       </v-form>
@@ -66,6 +68,7 @@
 <script>
 import useVuelidate from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
+import axios from "axios";
 
 export default {
   setup() {
@@ -75,6 +78,7 @@ export default {
   data() {
     return {
       confirmPassword: "",
+      isLoading: false,
       user: {
         username: "",
         email: "",
@@ -109,8 +113,18 @@ export default {
   },
 
   methods: {
-    onSubmit() {
-      this.$router.push("/login");
+    async onSubmit() {
+      const headers = {
+        "Content-Type": "application/json",
+      };
+      try {
+        this.isLoading = true;
+        await axios.post("http://localhost:5000/register", this.user, headers);
+      } catch (error) {
+        console.error(error);
+      }
+      this.isLoading = false;
+      this.$router.push("/login", { query: { registered: true } });
     },
     loginPage() {
       this.$router.push("/login");
