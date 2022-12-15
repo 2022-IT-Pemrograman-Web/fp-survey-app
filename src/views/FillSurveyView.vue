@@ -5,11 +5,16 @@
     min-height="300"
   >
     <v-card-title>
-      <p class="text-h3 text--primary my-5">{{ survey.title }}</p>
+      <p class="text-h4 text--primary mt-3">{{ survey.title }}</p>
     </v-card-title>
     <v-card-text>
       <v-list-item-content>
-        <v-list-item-title>{{ survey.description }}</v-list-item-title>
+        <v-list-item-title class="mb-5"
+          >by {{ survey.surveyor.name }}</v-list-item-title
+        >
+        <v-list-item-title class="mb-5">{{
+          survey.description
+        }}</v-list-item-title>
       </v-list-item-content>
 
       <v-form @submit.prevent="submitAnswers" lazy-validation>
@@ -39,6 +44,10 @@ export default {
     return {
       tempAnswers: {},
       survey: {
+        surveyor: {
+          id: "1",
+          name: "John Doe",
+        },
         title: "Ini Survey",
         description: "Lorem Ipsum",
         questions: [

@@ -4,6 +4,7 @@ import LoginView from "../views/LoginView.vue";
 import RegisterView from "../views/RegisterView.vue";
 import CreateSurveyView from "../views/CreateSurveyView.vue";
 import FillSurveyView from "../views/FillSurveyView.vue";
+import AllSurveysView from "../views/AllSurveysView.vue";
 
 const routes = [
   {
@@ -39,6 +40,11 @@ const routes = [
     path: "/fill_survey",
     name: "fill_survey",
     component: FillSurveyView,
+  },
+  {
+    path: "/all_surveys",
+    name: "all_surveys",
+    component: AllSurveysView,
   },
 ];
 
