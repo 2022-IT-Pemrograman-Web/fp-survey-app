@@ -3,6 +3,7 @@ import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 import RegisterView from "../views/RegisterView.vue";
 import CreateSurveyView from "../views/CreateSurveyView.vue";
+import FillSurveyView from "../views/FillSurveyView.vue";
 
 const routes = [
   {
@@ -30,9 +31,14 @@ const routes = [
     component: RegisterView,
   },
   {
-    path: "/survey_form",
-    name: "survey_form",
+    path: "/create_survey",
+    name: "create_survey",
     component: CreateSurveyView,
+  },
+  {
+    path: "/fill_survey",
+    name: "fill_survey",
+    component: FillSurveyView,
   },
 ];
 
