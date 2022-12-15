@@ -6,6 +6,7 @@ import CreateSurveyView from "../views/CreateSurveyView.vue";
 import FillSurveyView from "../views/FillSurveyView.vue";
 import AllSurveysView from "../views/AllSurveysView.vue";
 import MySurveysView from "../views/MySurveysView.vue";
+import ResponseView from "../views/ResponseView.vue";
 
 const routes = [
   {
@@ -51,6 +52,11 @@ const routes = [
     path: "/my_surveys",
     name: "my_surveys",
     component: MySurveysView,
+  },
+  {
+    path: "/response",
+    name: "response",
+    component: ResponseView,
   },
 ];
 
