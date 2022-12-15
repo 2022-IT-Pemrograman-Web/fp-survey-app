@@ -1,7 +1,20 @@
 <template>
   <AppBar />
-  <v-container>
-    <p class="text-h4 text--primary text-center my-5">My Survey(s)</p>
+  <v-container v-if="isNull" class="d-flex flex-column">
+    <p class="text-h4 text--primary text-center my-10">
+      You do not have any survey
+    </p>
+    <v-btn
+      size="large"
+      color="deep-purple"
+      class="mx-auto my-5"
+      to="/create_survey"
+    >
+      Create Survey
+    </v-btn>
+  </v-container>
+  <v-container v-else>
+    <p class="text-h4 text--primary text-center my-10">My Survey(s)</p>
     <v-card
       class="d-flex flex-column mx-auto my-4 py-5 px-5"
       max-width="700"
@@ -41,6 +54,7 @@ export default {
   },
   data() {
     return {
+      isNull: false,
       surveys: [],
       ...useUser(),
     };
@@ -56,6 +70,7 @@ export default {
           `http://localhost:5000/form?surveyorId=${this.user.id}`
         );
         this.surveys = response.data.forms;
+        if (this.surveys.length === 0) this.isNull = true;
       } catch (error) {
         console.error(error);
       }

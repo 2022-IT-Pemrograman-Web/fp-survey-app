@@ -30,21 +30,6 @@ export default {
   data() {
     return {
       answer: {},
-      response: {
-        survey: {
-          id: "",
-          title: "Ini Survey",
-        },
-        responden: {
-          id: "1",
-          name: "John Doe",
-        },
-        answers: {
-          "Do you like an apple?": "Yes",
-          "Do you like an orange?": "No",
-          "Do you like an banana?": "Yes",
-        },
-      },
       ...useUser(),
     };
   },

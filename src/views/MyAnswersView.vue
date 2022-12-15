@@ -1,6 +1,19 @@
 <template>
   <AppBar />
-  <v-container>
+  <v-container v-if="isNull" class="d-flex flex-column">
+    <p class="text-h4 text--primary text-center my-10">
+      You have not filled any survey yet
+    </p>
+    <v-btn
+      size="large"
+      color="deep-purple"
+      class="mx-auto my-5"
+      to="/all_surveys"
+    >
+      Be a Responden
+    </v-btn>
+  </v-container>
+  <v-container v-else>
     <p class="text-h4 text--primary text-center my-10">My Answer(s)</p>
     <v-card
       class="d-flex flex-column mx-auto my-4 py-5 px-5"
@@ -36,6 +49,7 @@ export default {
   },
   data() {
     return {
+      isNull: false,
       answers: [],
       ...useUser(),
     };
@@ -51,6 +65,7 @@ export default {
           `http://localhost:5000/my_answers?userId=${this.user.id}`
         );
         this.answers = response.data.answers;
+        if (this.answers.length === 0) this.isNull = true;
       } catch (error) {
         console.error(error);
       }
