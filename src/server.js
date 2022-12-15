@@ -101,19 +101,42 @@ fastify.post("/register", async (req, rep) => {
 
 fastify.post("/form", async (req, rep) => {
   try {
+    console.log(req.body);
     const formId = await fastify.firebase.firestore().collection("Form").doc()
       .id;
     // console.log(UserId);
     const form = {
       id: formId,
-      Deskripsi: req.body.Deskripsi,
-      Nama: req.body.Nama,
-      id_user: req.body.id_user,
+      surveyor: req.body.surveyor,
+      title: req.body.title,
+      description: req.body.description,
+      questions: req.body.questions,
+      created_at: new Date(),
     };
     await fastify.firebase.firestore().collection("Form").doc(formId).set(form);
     return rep.send({
       message: "form created",
       data: form,
+      success: true,
+    });
+  } catch (err) {
+    return rep.send({
+      message: err,
+      success: false,
+    });
+  }
+});
+
+fastify.get("/form", async (req, rep) => {
+  try {
+    let forms = await fastify.firebase.firestore().collection("Form").get();
+    forms = forms.docs.map((doc) => doc.data());
+    console.log(req.query.surveyorId);
+    // console.log(forms);
+    forms = forms.filter((form) => form.surveyor?.id === req.query.surveyorId);
+    return rep.send({
+      forms,
+      message: "All forms",
       success: true,
     });
   } catch (err) {

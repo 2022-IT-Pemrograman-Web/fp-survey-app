@@ -5,7 +5,9 @@
     min-height="300"
   >
     <v-card-title>
-      <p class="text-h3 text--primary my-5">New Survey</p>
+      <p v-if="survey.title.length === 0" class="text-h4 text--primary my-5">
+        New Survey
+      </p>
     </v-card-title>
     <v-card-text>
       <v-form
@@ -36,22 +38,26 @@
           >{{ isEditedTitle ? "Update" : "Create Survey" }}</v-btn
         >
       </v-form>
-      <div v-else>
-        <v-list-item-content>
-          <v-list-item-title>{{ survey.title }}</v-list-item-title>
-          <v-list-item-subtitle>{{ survey.description }}</v-list-item-subtitle>
-        </v-list-item-content>
-        <v-list-item-action>
-          <v-btn size="35" icon @click="editTitle()">
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-        </v-list-item-action>
+      <div class="d-flex flex-column" v-else>
+        <p class="text-h4 text--primary my-3">
+          {{ survey.title }}
+        </p>
+        <p class="text-h5">{{ survey.description }}</p>
+        <v-btn
+          @click="editTitle()"
+          color="warning"
+          max-width="200"
+          class="mt-2 mb-5"
+        >
+          edit title or desc
+        </v-btn>
       </div>
       <div v-if="survey.title.length > 0">
         <v-form
           v-model="v$.$dirty"
           @submit.prevent="addQuestion"
           lazy-validation
+          class="mb-3"
         >
           <v-text-field
             class="my-1"
@@ -63,30 +69,32 @@
           ></v-text-field>
           <v-btn
             type="submit"
-            color="purple"
-            class="my-3"
+            color="primary"
             :disabled="v$.tempQuestion.$invalid"
             >Add Question</v-btn
           >
         </v-form>
-        <v-list-item
-          v-for="question in survey.questions"
-          :key="question"
-          class="d-flex flex-row justify-space-between"
-        >
-          <v-list-item-content>
-            <v-list-item-title>{{ question }}</v-list-item-title>
-          </v-list-item-content>
-          <v-list-item-action>
-            <v-btn size="35" icon @click="deleteQuestion(question)">
+        <v-row v-for="question in survey.questions" :key="question">
+          <v-col>
+            <p>
+              {{ question }}
+            </p>
+          </v-col>
+          <v-col>
+            <v-btn
+              size="35"
+              icon
+              @click="deleteQuestion(question)"
+              color="error"
+            >
               <v-icon>mdi-delete</v-icon>
             </v-btn>
-          </v-list-item-action>
-        </v-list-item>
+          </v-col>
+        </v-row>
         <v-btn
           color="purple"
-          class="my-3"
-          :disabled="survey.questions.length === 0"
+          class="my-5"
+          :disabled="survey.questions.length === 0 || isLoading"
           @click="submitSurvey"
           >Submit Questions</v-btn
         >
@@ -98,6 +106,8 @@
 <script>
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
+import axios from "axios";
+import useUser from "@/store/user";
 
 export default {
   setup() {
@@ -109,11 +119,17 @@ export default {
       tempDescription: "",
       tempQuestion: "",
       isEditedTitle: false,
+      isLoading: false,
       survey: {
+        surveyor: {
+          id: "",
+          name: "",
+        },
         title: "",
         description: "",
         questions: [],
       },
+      ...useUser(),
     };
   },
   validations() {
@@ -125,6 +141,12 @@ export default {
         required,
       },
     };
+  },
+  beforeMount() {
+    const tempUser = localStorage.getItem("user");
+    if (tempUser) {
+      this.user = JSON.parse(tempUser);
+    }
   },
   methods: {
     addQuestion() {
@@ -145,14 +167,30 @@ export default {
       this.isEditedTitle = true;
     },
     newSurvey() {
+      this.survey.surveyor.id = this.user?.id;
+      this.survey.surveyor.name = this.user?.name;
       this.survey.title = this.tempTitle;
       this.survey.description = this.tempDescription;
       this.tempTitle = "";
       this.tempDescription = "";
       this.isEditedTitle = false;
     },
-    submitSurvey() {
-      console.log(this.survey);
+    async submitSurvey() {
+      const headers = {
+        "Content-Type": "application/json",
+      };
+      try {
+        this.isLoading = true;
+        await axios.post("http://localhost:5000/form", this.survey, headers);
+        this.$router.push({
+          path: "/my_surveys",
+          query: { created: "success" },
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.isLoading = false;
+      }
     },
   },
 };

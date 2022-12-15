@@ -3,17 +3,17 @@
     <p class="text-h4 text--primary text-center my-5">My Survey(s)</p>
     <v-card
       class="d-flex flex-column mx-auto my-4 py-5 px-5"
-      max-width="600"
+      max-width="700"
       v-for="(survey, index) in surveys"
       :key="index"
     >
       <v-card-title>
-        <p class="text-h5 text--primary">{{ survey.title }}</p>
+        <p class="overflow-x-auto text-h5 text--primary">{{ survey.title }}</p>
       </v-card-title>
       <v-card-text>
         <v-list-item-content>
           <v-list-item-subtitle
-            >by {{ survey.surveyor.name }}</v-list-item-subtitle
+            >by {{ survey.surveyor?.name }}</v-list-item-subtitle
           >
           <v-list-item-title class="mt-4">{{
             survey.description
@@ -30,40 +30,32 @@
 </template>
 
 <script>
+import useUser from "../store/user";
+import axios from "axios";
+
 export default {
   data() {
     return {
-      surveys: [
-        {
-          surveyor: {
-            id: "1",
-            name: "John Doe",
-          },
-          title: "Ini Survey",
-          description: "Lorem Ipsum",
-          questions: [
-            "Do you like an apple?",
-            "Do you like an orange?",
-            "Do you like an banana?",
-          ],
-        },
-        {
-          surveyor: {
-            id: "2",
-            name: "Jessica",
-          },
-          title: "Ini Survey 2",
-          description: "Lorem Ipsum 2",
-          questions: [
-            "Do you like an apple?",
-            "Do you like an orange?",
-            "Do you like an banana?",
-          ],
-        },
-      ],
+      surveys: [],
+      ...useUser(),
     };
   },
+  beforeMount() {
+    this.getSurveys();
+  },
   methods: {
+    async getSurveys() {
+      this.user = JSON.parse(localStorage.getItem("user"));
+      console.log(this.user.id);
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/form?surveyorId=${this.user.id}`
+        );
+        this.surveys = response.data.forms;
+      } catch (error) {
+        console.error(error);
+      }
+    },
     submitAnswers() {
       console.log(this.tempAnswers);
     },

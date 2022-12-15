@@ -125,11 +125,12 @@ export default {
           headers
         );
         console.log(response);
+        this.$router.push({ path: "/login", query: { registered: true } });
       } catch (error) {
         console.error(error);
+      } finally {
+        this.isLoading = false;
       }
-      this.isLoading = false;
-      this.$router.push({ path: "/login", query: { registered: true } });
     },
     loginPage() {
       this.$router.push("/login");

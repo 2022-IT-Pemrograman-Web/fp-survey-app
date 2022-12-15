@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
+import middlewarePipeline from "../middleware/middlewarePipeline";
+import auth from "../middleware/auth";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 import RegisterView from "../views/RegisterView.vue";
@@ -39,6 +41,9 @@ const routes = [
     path: "/create_survey",
     name: "create_survey",
     component: CreateSurveyView,
+    meta: {
+      middleware: [auth],
+    },
   },
   {
     path: "/fill_survey",
@@ -75,6 +80,26 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  /** Navigate to next if middleware is not applied */
+  if (!to.meta.middleware) {
+    return next();
+  }
+
+  const middleware = to.meta.middleware;
+  const context = {
+    to,
+    from,
+    next,
+    //   store  | You can also pass store as an argument
+  };
+
+  return middleware[0]({
+    ...context,
+    next: middlewarePipeline(context, middleware, 1),
+  });
 });
 
 export default router;
