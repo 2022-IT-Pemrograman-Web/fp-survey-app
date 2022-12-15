@@ -1,15 +1,14 @@
 <template>
+  <AppBar />
   <v-card
     class="d-flex flex-column mx-auto my-16 py-5 px-5"
     max-width="700"
     min-height="300"
   >
-    <v-card-title>
-      <p class="text-h4 text--primary mt-3">{{ response.survey.title }}</p>
-      <p class="text-h6">{{ response.responden.name }}</p>
-    </v-card-title>
+    <v-card-title class="text-h4">{{ answer.survey.title }} </v-card-title>
+    <v-card-text> filled by {{ answer.responden.name }} </v-card-text>
     <v-list-item-content
-      v-for="(value, question) in response.answers"
+      v-for="(value, question) in answer.answers"
       :key="question"
       class="my-1 mx-5"
     >
@@ -20,9 +19,17 @@
 </template>
 
 <script>
+import useUser from "../store/user";
+import axios from "axios";
+import AppBar from "../components/AppBar.vue";
+
 export default {
+  components: {
+    AppBar,
+  },
   data() {
     return {
+      answer: {},
       response: {
         survey: {
           id: "",
@@ -38,7 +45,24 @@ export default {
           "Do you like an banana?": "Yes",
         },
       },
+      ...useUser(),
     };
+  },
+  beforeMount() {
+    this.user = JSON.parse(localStorage.getItem("user"));
+    this.getAnswer();
+  },
+  methods: {
+    async getAnswer() {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/answer/${this.$route.params.id}`
+        );
+        this.answer = response.data.answer;
+      } catch (error) {
+        console.error(error);
+      }
+    },
   },
 };
 </script>

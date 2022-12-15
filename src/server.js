@@ -6,7 +6,7 @@ const PORT = 5000;
 
 fastify.register(fastifyFirebase, key);
 fastify.register(cors, { origin: "*" });
-fastify.get("/allUser", async (req, rep) => {
+fastify.get("/users", async (req, rep) => {
   try {
     let users = await fastify.firebase.firestore().collection("User").get();
     users = users.docs.map((doc) => doc.data());
@@ -99,18 +99,14 @@ fastify.post("/register", async (req, rep) => {
   }
 });
 
+// create form
 fastify.post("/form", async (req, rep) => {
   try {
-    console.log(req.body);
     const formId = await fastify.firebase.firestore().collection("Form").doc()
       .id;
-    // console.log(UserId);
     const form = {
       id: formId,
-      surveyor: req.body.surveyor,
-      title: req.body.title,
-      description: req.body.description,
-      questions: req.body.questions,
+      ...req.body,
       created_at: new Date(),
     };
     await fastify.firebase.firestore().collection("Form").doc(formId).set(form);
@@ -127,12 +123,12 @@ fastify.post("/form", async (req, rep) => {
   }
 });
 
+// get my form
 fastify.get("/form", async (req, rep) => {
   try {
     let forms = await fastify.firebase.firestore().collection("Form").get();
     forms = forms.docs.map((doc) => doc.data());
     console.log(req.query.surveyorId);
-    // console.log(forms);
     forms = forms.filter((form) => form.surveyor?.id === req.query.surveyorId);
     return rep.send({
       forms,
@@ -147,45 +143,18 @@ fastify.get("/form", async (req, rep) => {
   }
 });
 
-fastify.get("/past-form", async (req, rep) => {
+// get my form
+fastify.get("/form/:id", async (req, rep) => {
   try {
-    let forms = await fastify.firebase
-      .firestore()
-      .collection("Isiform")
-      .where("id_user", "==", req.query.id)
-      .get();
-    forms = forms.docs.map((doc) => doc.data());
-    let item = {};
-    let list_id_form = [];
-    for (let form in forms) {
-      let { id_form, id, tanggal_isi } = forms[form];
-      item[id_form] = id;
-      list_id_form[id_form] = tanggal_isi;
-      list_id_form.push(id_form);
-    }
-    let nama_forms = await fastify.firebase
+    let form = await fastify.firebase
       .firestore()
       .collection("Form")
-      .where("id", "in", list_id_form)
+      .where("id", "==", req.params.id)
       .get();
-    nama_forms = nama_forms.docs.map((doc) => doc.data());
-    let formulirs = {};
-    for (let nama_form in nama_forms) {
-      let { id, Nama } = nama_forms[nama_form];
-      formulirs[id] = Nama;
-    }
-    let formulir = [];
-    for (let i in item) {
-      formulir.push({
-        id_form: i,
-        nama_form: formulirs[i],
-        id_Isiform: item[i],
-        tanggal_isi: list_id_form[i],
-      });
-    }
+    form = form.docs.map((doc) => doc.data());
     return rep.send({
-      message: "form yang sudah diisi",
-      formulir,
+      form: form[0],
+      message: "Success",
       success: true,
     });
   } catch (err) {
@@ -196,22 +165,16 @@ fastify.get("/past-form", async (req, rep) => {
   }
 });
 
-fastify.get("/Isiform/:id", async (req, rep) => {
+// get all form except mine
+fastify.get("/all_forms", async (req, rep) => {
   try {
-    let Pertanyaans = await fastify.firebase
-      .firestore()
-      .collection("Pertanyaan")
-      .where("id_form", "==", req.query.id)
-      .get();
-    Pertanyaans = Pertanyaans.docs.map((doc) => doc.data());
-    let pertanyaan = [];
-    for (let i in Pertanyaans) {
-      pertanyaan.push({ Pertanyaan: Pertanyaans[i].Pertanyaan });
-    }
-    // return pertanyaan;
+    let forms = await fastify.firebase.firestore().collection("Form").get();
+    forms = forms.docs.map((doc) => doc.data());
+    console.log(req.query.userId);
+    forms = forms.filter((form) => form.surveyor?.id !== req.query.userId);
     return rep.send({
-      pertanyaan,
-      message: "All Question",
+      forms,
+      message: "All forms",
       success: true,
     });
   } catch (err) {
@@ -222,28 +185,26 @@ fastify.get("/Isiform/:id", async (req, rep) => {
   }
 });
 
-fastify.post("/Isiform/:id", async (req, rep) => {
-  // return req.body.jawabans;
+// fill the form
+fastify.post("/fill_form", async (req, rep) => {
   try {
-    const IsiformId = await fastify.firebase
+    const isiFormId = await fastify.firebase
       .firestore()
       .collection("Isiform")
       .doc().id;
-    const Isiform = {
-      id: IsiformId,
-      id_form: req.query.id,
-      id_user: req.body.id_user,
-      Jawaban: req.body.jawabans,
-      tanggal_isi: new Date(),
+    const isiForm = {
+      id: isiFormId,
+      ...req.body,
+      filled_at: new Date(),
     };
     await fastify.firebase
       .firestore()
       .collection("Isiform")
-      .doc(IsiformId)
-      .set(Isiform);
+      .doc(isiFormId)
+      .set(isiForm);
     return rep.send({
-      message: "Isiform created",
-      data: Isiform,
+      message: "Response created",
+      data: isiForm,
       success: true,
     });
   } catch (err) {
@@ -254,52 +215,21 @@ fastify.post("/Isiform/:id", async (req, rep) => {
   }
 });
 
-fastify.post("/Pertanyaan", async (req, rep) => {
+// get my answers
+fastify.get("/my_answers", async (req, rep) => {
   try {
-    const PertanyaanId = await fastify.firebase
-      .firestore()
-      .collection("Pertanyaan")
-      .doc().id;
-    // console.log(UserId);
-    const Pertanyaan = {
-      id: PertanyaanId,
-      Pertanyaan: req.body.Pertanyaan,
-      id_form: req.body.id_form,
-    };
-    await fastify.firebase
-      .firestore()
-      .collection("Pertanyaan")
-      .doc(PertanyaanId)
-      .set(Pertanyaan);
-    return rep.send({
-      message: "Pertanyaan created",
-      data: Pertanyaan,
-      success: true,
-    });
-  } catch (err) {
-    return rep.send({
-      message: err,
-      success: false,
-    });
-  }
-});
-
-fastify.get("/past_jawaban", async (req, rep) => {
-  try {
-    let Jawabans = await fastify.firebase
+    let answers = await fastify.firebase
       .firestore()
       .collection("Isiform")
-      .where("id", "==", req.query.id)
       .get();
-    Jawabans = Jawabans.docs.map((doc) => doc.data());
-    let jawaban = [];
-    for (let i in Jawabans) {
-      jawaban.push({ Jawaban: Jawabans[i].Jawaban });
-    }
-    // return pertanyaan;
+    answers = answers.docs.map((doc) => doc.data());
+    answers = answers.filter(
+      (answer) => answer.responden?.id === req.query.userId
+    );
+    console.log(answers);
     return rep.send({
-      jawaban,
-      message: "All Jawaban",
+      answers,
+      message: "Success",
       success: true,
     });
   } catch (err) {
@@ -309,6 +239,56 @@ fastify.get("/past_jawaban", async (req, rep) => {
     });
   }
 });
+
+// get answer
+fastify.get("/answer/:id", async (req, rep) => {
+  try {
+    let answers = await fastify.firebase
+      .firestore()
+      .collection("Isiform")
+      .where("id", "==", req.params.id)
+      .get();
+    answers = answers.docs.map((doc) => doc.data());
+    const answer = answers[0];
+    console.log(answer);
+    return rep.send({
+      answer,
+      message: "Success",
+      success: true,
+    });
+  } catch (err) {
+    return rep.send({
+      message: err,
+      success: false,
+    });
+  }
+});
+
+// get answers of survey
+fastify.get("/answers", async (req, rep) => {
+  try {
+    let answers = await fastify.firebase
+      .firestore()
+      .collection("Isiform")
+      .get();
+    answers = answers.docs.map((doc) => doc.data());
+    answers = answers.filter(
+      (answer) => answer.survey?.id === req.query.surveyId
+    );
+    console.log(answers);
+    return rep.send({
+      answers,
+      message: "Success",
+      success: true,
+    });
+  } catch (err) {
+    return rep.send({
+      message: err,
+      success: false,
+    });
+  }
+});
+
 const start = async () => {
   try {
     await fastify.listen(PORT);

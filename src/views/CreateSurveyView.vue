@@ -107,7 +107,7 @@
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import axios from "axios";
-import useUser from "@/store/user";
+import useUser from "../store/user";
 
 export default {
   setup() {

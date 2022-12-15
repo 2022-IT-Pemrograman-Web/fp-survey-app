@@ -1,4 +1,5 @@
 <template>
+  <AppBar />
   <v-container>
     <p class="text-h4 text--primary text-center my-5">My Survey(s)</p>
     <v-card
@@ -21,7 +22,7 @@
         </v-list-item-content>
       </v-card-text>
       <v-card-actions>
-        <v-btn class="mx-auto" color="purple" to="/survey_responses"
+        <v-btn class="mx-auto" color="purple" @click="toAnswers(survey.id)"
           >Responses</v-btn
         >
       </v-card-actions>
@@ -32,8 +33,12 @@
 <script>
 import useUser from "../store/user";
 import axios from "axios";
+import AppBar from "@/components/AppBar.vue";
 
 export default {
+  components: {
+    AppBar,
+  },
   data() {
     return {
       surveys: [],
@@ -56,8 +61,8 @@ export default {
         console.error(error);
       }
     },
-    submitAnswers() {
-      console.log(this.tempAnswers);
+    toAnswers(id) {
+      this.$router.push(`/survey_responses/${id}`);
     },
   },
 };

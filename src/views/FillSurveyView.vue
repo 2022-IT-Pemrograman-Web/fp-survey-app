@@ -1,4 +1,5 @@
 <template>
+  <AppBar />
   <v-card
     class="d-flex flex-column mx-auto my-16 py-5 px-5"
     max-width="1200"
@@ -9,9 +10,6 @@
     </v-card-title>
     <v-card-text>
       <v-list-item-content>
-        <v-list-item-title class="mb-5"
-          >by {{ survey.surveyor.name }}</v-list-item-title
-        >
         <v-list-item-title class="mb-5">{{
           survey.description
         }}</v-list-item-title>
@@ -30,7 +28,10 @@
           type="submit"
           color="purple"
           class="my-3"
-          :disabled="Object.keys(tempAnswers).length < survey.questions.length"
+          :disabled="
+            Object.keys(tempAnswers).length < survey.questions?.length ||
+            isLoading
+          "
           >Submit Answers</v-btn
         >
       </v-form>
@@ -39,28 +40,62 @@
 </template>
 
 <script>
+import axios from "axios";
+import useUser from "../store/user";
+import AppBar from "@/components/AppBar.vue";
+
 export default {
+  components: {
+    AppBar,
+  },
   data() {
     return {
       tempAnswers: {},
-      survey: {
-        surveyor: {
-          id: "1",
-          name: "John Doe",
-        },
-        title: "Ini Survey",
-        description: "Lorem Ipsum",
-        questions: [
-          "Do you like an apple?",
-          "Do you like an orange?",
-          "Do you like an banana?",
-        ],
-      },
+      isLoading: false,
+      survey: {},
+      ...useUser(),
     };
   },
+  beforeMount() {
+    this.user = JSON.parse(localStorage.getItem("user"));
+    this.getSurvey();
+  },
   methods: {
-    submitAnswers() {
-      console.log(this.tempAnswers);
+    async getSurvey() {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/form/${this.$route.params.id}`
+        );
+        this.survey = response.data.form;
+        console.log(this.survey.surveyor);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async submitAnswers() {
+      const data = {
+        survey: {
+          id: this.survey.id,
+          title: this.survey.title,
+        },
+        responden: {
+          id: this.user.id,
+          name: this.user.name,
+        },
+        answers: this.tempAnswers,
+      };
+      const headers = {
+        "Content-Type": "application/json",
+      };
+      try {
+        this.isLoading = true;
+        await axios.post("http://localhost:5000/fill_form", data, headers);
+        this.$router.push({ path: "/my_answers", query: { success: true } });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.isLoading = false;
+      }
     },
   },
 };

@@ -12,15 +12,15 @@
       <v-form v-model="v$.$dirty" @submit.prevent="onSubmit" lazy-validation>
         <v-text-field
           class="my-1"
-          v-model="user.username"
-          :error-messages="v$.user.username?.$error"
+          v-model="tempUser.username"
+          :error-messages="v$.tempUser.username?.$error"
           label="Username"
           required
         ></v-text-field>
         <v-text-field
           class="my-1"
-          v-model="user.password"
-          :error-messages="v$.user.password?.$error"
+          v-model="tempUser.password"
+          :error-messages="v$.tempUser.password?.$error"
           label="Password"
           required
           type="password"
@@ -35,7 +35,7 @@
           type="submit"
           color="purple"
           class="my-3"
-          :disabled="v$.user.$invalid"
+          :disabled="v$.tempUser.$invalid"
           >Login</v-btn
         >
       </v-form>
@@ -55,16 +55,16 @@ export default {
   },
   data() {
     return {
-      user: {
+      tempUser: {
         username: "",
         password: "",
-        tes: "",
       },
+      ...useUser(),
     };
   },
   validations() {
     return {
-      user: {
+      tempUser: {
         username: {
           required,
         },
@@ -72,7 +72,6 @@ export default {
           required,
         },
       },
-      ...useUser(),
     };
   },
   methods: {
@@ -82,7 +81,7 @@ export default {
       };
       const response = await axios.post(
         "http://localhost:5000/login",
-        this.user,
+        this.tempUser,
         headers
       );
       this.user = response.data;

@@ -8,7 +8,7 @@ import CreateSurveyView from "../views/CreateSurveyView.vue";
 import FillSurveyView from "../views/FillSurveyView.vue";
 import AllSurveysView from "../views/AllSurveysView.vue";
 import MySurveysView from "../views/MySurveysView.vue";
-import ResponseView from "../views/ResponseView.vue";
+import AnswerView from "../views/AnswerView.vue";
 import MyAnswersView from "../views/MyAnswersView.vue";
 import SurveyResponsesView from "../views/SurveyResponsesView.vue";
 
@@ -17,15 +17,6 @@ const routes = [
     path: "/",
     name: "home",
     component: HomeView,
-  },
-  {
-    path: "/about",
-    name: "about",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
   },
   {
     path: "/login",
@@ -46,34 +37,52 @@ const routes = [
     },
   },
   {
-    path: "/fill_survey",
+    path: "/fill_survey/:id",
     name: "fill_survey",
     component: FillSurveyView,
+    meta: {
+      middleware: [auth],
+    },
   },
   {
     path: "/all_surveys",
     name: "all_surveys",
     component: AllSurveysView,
+    meta: {
+      middleware: [auth],
+    },
   },
   {
     path: "/my_surveys",
     name: "my_surveys",
     component: MySurveysView,
+    meta: {
+      middleware: [auth],
+    },
   },
   {
-    path: "/response",
-    name: "response",
-    component: ResponseView,
+    path: "/answer/:id",
+    name: "answer",
+    component: AnswerView,
+    meta: {
+      middleware: [auth],
+    },
   },
   {
     path: "/my_answers",
     name: "my_answers",
     component: MyAnswersView,
+    meta: {
+      middleware: [auth],
+    },
   },
   {
-    path: "/survey_responses",
+    path: "/survey_responses/:id",
     name: "survey_responses",
     component: SurveyResponsesView,
+    meta: {
+      middleware: [auth],
+    },
   },
 ];
 
