@@ -56,13 +56,20 @@ export default {
   },
   beforeMount() {
     this.user = JSON.parse(localStorage.getItem("user"));
+    this.accessToken = JSON.parse(localStorage.getItem("accessToken"));
     this.getAnswers();
   },
   methods: {
     async getAnswers() {
       try {
         const response = await axios.get(
-          `http://localhost:5000/my_answers?userId=${this.user.id}`
+          `http://localhost:5000/my_answers?userId=${this.user.id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${this.accessToken}`,
+            },
+          }
         );
         this.answers = response.data.answers;
         if (this.answers.length === 0) this.isNull = true;

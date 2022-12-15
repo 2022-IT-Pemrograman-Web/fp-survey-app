@@ -1,6 +1,11 @@
 <template>
   <AppBar />
-  <v-container>
+  <v-container v-if="isNull" class="d-flex flex-column">
+    <p class="text-h4 text--primary text-center my-10">
+      Oops! This survey has no response :(
+    </p>
+  </v-container>
+  <v-container v-else>
     <p class="text-h4 text--primary text-center my-5">Response(s)</p>
     <v-card
       class="d-flex flex-column mx-auto my-4 py-5 px-5"
@@ -38,21 +43,30 @@ export default {
   },
   data() {
     return {
+      isNull: false,
       ...useUser(),
       answers: [],
     };
   },
   beforeMount() {
     this.user = JSON.parse(localStorage.getItem("user"));
+    this.accessToken = JSON.parse(localStorage.getItem("accessToken"));
     this.getAnswers();
   },
   methods: {
     async getAnswers() {
       try {
         const response = await axios.get(
-          `http://localhost:5000/answers?surveyId=${this.$route.params.id}`
+          `http://localhost:5000/answers?surveyId=${this.$route.params.id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${this.accessToken}`,
+            },
+          }
         );
         this.answers = response.data.answers;
+        if (this.answers.length === 0) this.isNull = true;
       } catch (error) {
         console.error(error);
       }

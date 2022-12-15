@@ -5,7 +5,7 @@
     max-width="700"
     min-height="300"
   >
-    <v-card-title class="text-h4">{{ answer.survey.title }} </v-card-title>
+    <p class="text-h4 mx-4">{{ answer.survey.title }}</p>
     <v-card-text> filled by {{ answer.responden.name }} </v-card-text>
     <v-list-item-content
       v-for="(value, question) in answer.answers"
@@ -35,13 +35,20 @@ export default {
   },
   beforeMount() {
     this.user = JSON.parse(localStorage.getItem("user"));
+    this.accessToken = JSON.parse(localStorage.getItem("accessToken"));
     this.getAnswer();
   },
   methods: {
     async getAnswer() {
       try {
         const response = await axios.get(
-          `http://localhost:5000/answer/${this.$route.params.id}`
+          `http://localhost:5000/answer/${this.$route.params.id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${this.accessToken}`,
+            },
+          }
         );
         this.answer = response.data.answer;
       } catch (error) {

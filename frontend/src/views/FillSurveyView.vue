@@ -53,13 +53,20 @@ export default {
   },
   beforeMount() {
     this.user = JSON.parse(localStorage.getItem("user"));
+    this.accessToken = JSON.parse(localStorage.getItem("accessToken"));
     this.getSurvey();
   },
   methods: {
     async getSurvey() {
       try {
         const response = await axios.get(
-          `http://localhost:5000/form/${this.$route.params.id}`
+          `http://localhost:5000/form/${this.$route.params.id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${this.accessToken}`,
+            },
+          }
         );
         this.survey = response.data.form;
       } catch (error) {
@@ -80,6 +87,7 @@ export default {
       };
       const headers = {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${this.accessToken}`,
       };
       try {
         this.isLoading = true;

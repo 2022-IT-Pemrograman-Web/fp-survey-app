@@ -52,14 +52,21 @@ export default {
     };
   },
   beforeMount() {
+    this.user = JSON.parse(localStorage.getItem("user"));
+    this.accessToken = JSON.parse(localStorage.getItem("accessToken"));
     this.getSurveys();
   },
   methods: {
     async getSurveys() {
-      this.user = JSON.parse(localStorage.getItem("user"));
       try {
         const response = await axios.get(
-          `http://localhost:5000/all_forms?userId=${this.user.id}`
+          `http://localhost:5000/all_forms?userId=${this.user.id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${this.accessToken}`,
+            },
+          }
         );
         this.surveys = response.data.forms;
         if (this.surveys.length === 0) this.isNull = true;

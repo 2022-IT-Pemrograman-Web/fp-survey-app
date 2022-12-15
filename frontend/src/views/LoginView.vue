@@ -84,8 +84,10 @@ export default {
         this.tempUser,
         headers
       );
-      this.user = response.data;
+      this.user = response.data.data.user;
+      this.accessToken = response.data.data.accessToken;
       localStorage.setItem("user", JSON.stringify(this.user));
+      localStorage.setItem("accessToken", JSON.stringify(this.accessToken));
       this.$router.push("/");
     },
     registerPage() {

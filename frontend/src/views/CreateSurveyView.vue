@@ -143,10 +143,8 @@ export default {
     };
   },
   beforeMount() {
-    const tempUser = localStorage.getItem("user");
-    if (tempUser) {
-      this.user = JSON.parse(tempUser);
-    }
+    this.user = localStorage.getItem("user");
+    this.accessToken = JSON.parse.getItem("accessToken");
   },
   methods: {
     addQuestion() {
@@ -178,6 +176,7 @@ export default {
     async submitSurvey() {
       const headers = {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${this.accessToken}`,
       };
       try {
         this.isLoading = true;
