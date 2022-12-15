@@ -39,6 +39,14 @@
           required
           type="password"
         ></v-text-field>
+        <v-text-field
+          class="my-1"
+          v-model="confirmPassword"
+          :error-messages="v$.confirmPassword.$error"
+          label="Confirm Password"
+          required
+          type="password"
+        ></v-text-field>
         <p>
           Already have an account?
           <button @click="loginPage" role="link" class="login">Login</button>
@@ -47,7 +55,7 @@
           type="submit"
           color="purple"
           class="my-3"
-          :disabled="v$.user.$invalid"
+          :disabled="v$.user.$invalid || v$.confirmPassword.$invalid"
           >Register</v-btn
         >
       </v-form>
@@ -66,6 +74,7 @@ export default {
 
   data() {
     return {
+      confirmPassword: "",
       user: {
         username: "",
         email: "",
@@ -91,6 +100,10 @@ export default {
         password: {
           required,
         },
+      },
+      confirmPassword: {
+        required,
+        sameAsPassword: (value) => value === this.user.password,
       },
     };
   },
