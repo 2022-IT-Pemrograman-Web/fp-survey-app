@@ -1,9 +1,11 @@
 var key = require("../credential.json");
 var fastifyFirebase = require("fastify-firebase");
 const fastify = require("fastify")({ logger: true });
+const cors = require("@fastify/cors");
 const PORT = 5000;
 
 fastify.register(fastifyFirebase, key);
+fastify.register(cors, { origin: "*" });
 fastify.get("/allUser", async (req, rep) => {
   try {
     let users = await fastify.firebase.firestore().collection("User").get();
@@ -21,37 +23,8 @@ fastify.get("/allUser", async (req, rep) => {
   }
 });
 
-fastify.get("/getform", async (req, rep) => {
+fastify.post("/login", async (req, rep) => {
   try {
-    let form = await fastify.firebase.firestore().collection("Form").get();
-    form = form.docs.map((doc) => doc.data());
-    let item = {};
-    for (let i in form) {
-      if (form[i].id_user == req.query.id) {
-        continue;
-      } else {
-        item[form[i].id] = form[i];
-      }
-    }
-    return rep.send({
-      item,
-      message: "All form",
-      success: true,
-    });
-  } catch (err) {
-    return rep.send({
-      message: err,
-      success: false,
-    });
-  }
-});
-fastify.get("/login", async (req, rep) => {
-  try {
-    let body = "";
-    for await (const data of req.raw) {
-      body += data.toString();
-    }
-    req.body = JSON.parse(body);
     let users = await fastify.firebase
       .firestore()
       .collection("User")
@@ -72,8 +45,9 @@ fastify.get("/login", async (req, rep) => {
       });
     }
     return rep.send({
-      name: users[0].name,
       id: users[0].id,
+      username: users[0].username,
+      name: users[0].name,
       message: "login",
       success: true,
     });
