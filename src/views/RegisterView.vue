@@ -26,8 +26,8 @@
         ></v-text-field>
         <v-text-field
           class="my-1"
-          v-model="user.fullName"
-          :error-messages="v$.user.fullName.$error"
+          v-model="user.name"
+          :error-messages="v$.user.name.$error"
           label="Full Name"
           required
         ></v-text-field>
@@ -82,7 +82,7 @@ export default {
       user: {
         username: "",
         email: "",
-        fullName: "",
+        name: "",
         password: "",
       },
     };
@@ -98,7 +98,7 @@ export default {
           required,
           email,
         },
-        fullName: {
+        name: {
           required,
         },
         password: {
@@ -119,12 +119,17 @@ export default {
       };
       try {
         this.isLoading = true;
-        await axios.post("http://localhost:5000/register", this.user, headers);
+        const response = await axios.post(
+          "http://localhost:5000/register",
+          this.user,
+          headers
+        );
+        console.log(response);
       } catch (error) {
         console.error(error);
       }
       this.isLoading = false;
-      this.$router.push("/login", { query: { registered: true } });
+      this.$router.push({ path: "/login", query: { registered: true } });
     },
     loginPage() {
       this.$router.push("/login");
