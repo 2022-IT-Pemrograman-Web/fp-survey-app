@@ -63,9 +63,6 @@ export default {
     fillSurvey(id) {
       this.$router.push(`/fill_survey/${id}`);
     },
-    submitAnswers() {
-      console.log(this.tempAnswers);
-    },
   },
 };
 </script>

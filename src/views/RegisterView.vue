@@ -124,7 +124,6 @@ export default {
           this.user,
           headers
         );
-        console.log(response);
         this.$router.push({ path: "/login", query: { registered: true } });
       } catch (error) {
         console.error(error);

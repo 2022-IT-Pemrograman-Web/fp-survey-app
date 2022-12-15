@@ -51,7 +51,6 @@ export default {
   methods: {
     async getSurveys() {
       this.user = JSON.parse(localStorage.getItem("user"));
-      console.log(this.user.id);
       try {
         const response = await axios.get(
           `http://localhost:5000/form?surveyorId=${this.user.id}`

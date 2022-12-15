@@ -75,7 +75,6 @@ fastify.post("/register", async (req, rep) => {
     }
     const UserId = await fastify.firebase.firestore().collection("User").doc()
       .id;
-    // console.log(UserId);
     const user = {
       id: UserId,
       username: req.body.username,
@@ -128,7 +127,6 @@ fastify.get("/form", async (req, rep) => {
   try {
     let forms = await fastify.firebase.firestore().collection("Form").get();
     forms = forms.docs.map((doc) => doc.data());
-    console.log(req.query.surveyorId);
     forms = forms.filter((form) => form.surveyor?.id === req.query.surveyorId);
     return rep.send({
       forms,
@@ -170,7 +168,6 @@ fastify.get("/all_forms", async (req, rep) => {
   try {
     let forms = await fastify.firebase.firestore().collection("Form").get();
     forms = forms.docs.map((doc) => doc.data());
-    console.log(req.query.userId);
     forms = forms.filter((form) => form.surveyor?.id !== req.query.userId);
     return rep.send({
       forms,
@@ -226,7 +223,6 @@ fastify.get("/my_answers", async (req, rep) => {
     answers = answers.filter(
       (answer) => answer.responden?.id === req.query.userId
     );
-    console.log(answers);
     return rep.send({
       answers,
       message: "Success",
@@ -250,7 +246,6 @@ fastify.get("/answer/:id", async (req, rep) => {
       .get();
     answers = answers.docs.map((doc) => doc.data());
     const answer = answers[0];
-    console.log(answer);
     return rep.send({
       answer,
       message: "Success",
@@ -275,7 +270,6 @@ fastify.get("/answers", async (req, rep) => {
     answers = answers.filter(
       (answer) => answer.survey?.id === req.query.surveyId
     );
-    console.log(answers);
     return rep.send({
       answers,
       message: "Success",

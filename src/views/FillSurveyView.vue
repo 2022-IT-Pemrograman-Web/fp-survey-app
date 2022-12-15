@@ -67,9 +67,8 @@ export default {
           `http://localhost:5000/form/${this.$route.params.id}`
         );
         this.survey = response.data.form;
-        console.log(this.survey.surveyor);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
     async submitAnswers() {
